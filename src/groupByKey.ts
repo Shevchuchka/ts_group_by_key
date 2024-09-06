@@ -20,25 +20,19 @@ interface Book {
   year: number;
 }
 
-export function groupByKey(
-  items: [],
-  key: string,
-): GroupsMap<Book[] | Student[]> {
-  const values: string[] = [];
+export function groupByKey<T extends Book | Student>(
+  items: T[],
+  key: keyof T,
+): GroupsMap<T> {
+  return items.reduce((groups: GroupsMap<T>, item: T) => {
+    const keyValue = item[key];
 
-  for (const item of items) {
-    const value = item[key];
-
-    if (!values.includes(value)) {
-      values.push(value);
+    if (!groups[keyValue as string]) {
+      groups[keyValue as string] = [];
     }
-  }
 
-  const result: GroupsMap<Book[] | Student[]> = {};
+    groups[keyValue as string].push(item);
 
-  for (const value of values) {
-    result[value] = items.filter((item) => item[key] === value);
-  }
-
-  return result;
+    return groups;
+  }, {});
 }
